@@ -1,5 +1,5 @@
 var app = app || {};
-var ENTER_KEY = 13;
+var ACTIONS = [ 'create', 'edit', 'delete' ];
 
 $(function () {
 	new app.AppView();
