@@ -15,14 +15,67 @@ var app = app || {};
 			if (app.action == ACTIONS[0]) {
 				var newuser = this.validate();
 				if (newuser) {
-					app.users.create( newuser );
+					var self = this;
+					$.ajax({
+						url: app.users.url,
+						method: 'POST',
+						data: newuser,
+						success: function(resp) {
+							if (resp && resp.message) {
+								$('.modal-body .response').text(resp.message);
+							} else {
+								newuser._id = resp._id;
+								app.users.add(new app.User(newuser));
+								self.render();
+							}
+						},
+						error: function(resp) {
+							$('.modal-body .response').text(resp.responseText);
+						}
+					});
+				}
+			} else if (app.action == ACTIONS[1]) {
+				var updateduser = this.validate();
+				if (updateduser) {
+					var user = app.users.get($(this.el).find('input[type="hidden"]').val());
+					if (user) {
+						var self = this;
+						user.save( updateduser, {
+							success: function(model, resp) {
+								if (resp && resp.message) {
+									$('.modal-body .response').text(resp.message);
+								} else {
+									self.render();
+								}
+							},
+							error: function(model, resp) {
+								$('.modal-body .response').text(resp.responseJSON.message);
+							},
+							wait: true
+						});
+					}
+				}
+			} else if (app.action == ACTIONS[2]) {
+				var user = app.users.get($(this.el).find('input[type="hidden"]').val());
+				if (user) {
+					user.destroy();
 					this.render();
 				}
 			}
-			if (app.action == ACTIONS[1]) {
-				console.log(this.model);
-				console.log(e);
-			}
+		},
+		prerender: function(param) {
+			this.$formwrap.html(this.template(param));
+		},
+		render: function() {
+			this.$el.modal('toggle');
+			return this;
+		},
+		reset: function () {
+			$('.modal-body .form-horizontal').find('input').each(function (i, el) {
+				$(el).val('');
+			})
+			$('.modal-body .response').text('');
+			window.location.href = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
 		},
 		validate: function() {
 			var validateEmail = function(email) {
@@ -37,6 +90,7 @@ var app = app || {};
 				'requiredempty': 'This field requires value',
 				'formatmismatch': 'Value provided does not match valid format'
 			};
+			$('.modal-body .response').text('');
 			var error = '';
 			var newuser = {};
 			var valid = true;
@@ -85,19 +139,6 @@ var app = app || {};
 				return newuser;
 			}
 			return false;
-		},
-		prerender: function(param) {
-			this.$formwrap.html(this.template(param));
-		},
-		render: function() {
-			this.$el.modal('toggle');
-			return this;
-		},
-		reset: function () {
-			$('.modal-body .form-horizontal').find('input').each(function (i, el) {
-				$(el).val('');
-			})
-			window.location.href = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
 		}
 	});
 	app.modal = new FormView();

@@ -10,6 +10,7 @@ var app = app || {};
 		},
 		initialize: function () {
 			this.listenTo(this.model, 'change', this.render);
+			this.listenTo(this.model, 'destroy', this.remove);
 		},
 		edit: function () {
 			var edit = this.model.toJSON();
@@ -19,7 +20,6 @@ var app = app || {};
 			app.modal.prerender(edit);
 		},
 		clear: function () {
-			// invoke this.model.destroy
 			var remove = this.model.toJSON();
 			remove['title'] = 'Are you sure that you want to Delete this user?';
 			remove['action'] = ACTIONS[2];
