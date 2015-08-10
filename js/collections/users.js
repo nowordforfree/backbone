@@ -1,10 +1,8 @@
-var app = app || {};
-
-(function () {
+define(['backbone', 'models/user'], function (Backbone, User) {
 	var Users = Backbone.Collection.extend({
-		model: app.User,
+		model: User,
 		url: 'http://127.0.0.1:3333/users/',
 		comparator: 'username'
 	});
-	app.users = new Users();
-})();
+	return new Users();
+})

@@ -1,7 +1,5 @@
-var app = app || {};
-
-(function () {
-	app.User = Backbone.Model.extend({
+define(['backbone'], function (Backbone) {
+	var User = Backbone.Model.extend({
 		idAttribute: '_id',
 		defaults: {
 			username: '',
@@ -11,4 +9,5 @@ var app = app || {};
 			phone: ''
 		}
 	})
-})()
+	return User;
+})

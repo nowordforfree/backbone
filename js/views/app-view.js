@@ -1,17 +1,24 @@
-var app = app || {};
-
-(function ($) {
-	app.AppView = Backbone.View.extend({
+define([
+	'jquery',
+	'backbone',
+	'collections/users',
+	'views/form-view',
+	'views/grid-view',
+	'common'
+	], function ($, Backbone, Users, FormView, GridView, common) {
+	var AppView = Backbone.View.extend({
 		el: $('body > .container'),
-
+		events: {
+			'click #showform': 'create'
+		},
 		initialize: function () {
-			this.$tbody = $('#users tbody');
-			this.$btnform = $('#showform');
+			this.form = new FormView();
 
-			this.listenTo(app.users, 'add', this.addOne);
-			this.listenTo(app.users, 'reset', this.addAll);
-			this.listenTo(app.users, 'action', this.show);
-			app.users.fetch({ reset: true });
+			this.$tbody = $('#users tbody');
+
+			this.listenTo(Users, 'add', this.addOne);
+			this.listenTo(Users, 'reset', this.addAll);
+			Users.fetch({ reset: true });
 		},
 		addOne: function (row) {
 			var view = new GridView({ model: row });
@@ -20,23 +27,16 @@ var app = app || {};
 		},
 		addAll: function () {
 			this.$tbody.html('');
-			app.users.each(this.addOne, this);
+			Users.each(this.addOne, this);
 		},
-		show: function() {
-			if (app.action && ACTIONS.indexOf(app.action) > -1) {
-				if (app.action == ACTIONS[0]) {
-					var create = {
-						title: this.setTitle(app.action),
-						action: ACTIONS[0],
-						save: 'Create'
-					}
-					app.modal.prerender(create);
-				}
-				app.modal.render();
-			}
-		},
-		setTitle: function (str) {
-			return str.charAt(0).toUpperCase() + str.substring(1).toLowerCase() + ' User';
+		create: function () {
+			var create = {
+				title: 'Create User',
+				action: common.ACTIONS[1],
+				save: 'Create'
+			};
+			this.form.prerender(create);
 		}
 	});
-})(jQuery);
+	return AppView;
+})
